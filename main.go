@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var tpl = template
+var tpl = template.Must(template.ParseFiles("index.html")))
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("<h1>Hello world!</h1>"))
