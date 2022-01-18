@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 type Article struct {
 	Source struct {
 		ID   interface{} `json:"id"`
@@ -22,7 +21,12 @@ type Article struct {
 	URLToImage  string    `json:"urlToImage"`
 	PublishedAt time.Time `json:"publishedAt"`
 	Content     string    `json:"content"`
-} 	
+}
+
+func (a *Article) FormatPublishedDate() string {
+	year, month, day := a.PublishedAt.Date()
+	return fmt.Sprintf("%v %d, %d", month, day, year)
+}
 
 
 type Results struct {
@@ -32,9 +36,9 @@ type Results struct {
 }
 
 type Client struct {
-	http		*http.Client
-	key			string
-	Pagesize 	int
+	http     *http.Client
+	key      string
+	PageSize int
 }
 
 func (c *Client) FetchEverything(query, page string) (*Results, error) {
@@ -52,15 +56,18 @@ func (c *Client) FetchEverything(query, page string) (*Results, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, 
+		return nil, fmt.Errorf(string(body))
 	}
+
+	res := &Results{}
+	return res, json.Unmarshal(body, res)
 }
 
-
-func NewClient(http.Client *http.Client, key string, pageSize int) *Client {
+func NewClient(httpClient *http.Client, key string, pageSize int) *Client {
 	if pageSize > 100 {
 		pageSize = 100
 	}
 
 	return &Client{httpClient, key, pageSize}
 }
+
